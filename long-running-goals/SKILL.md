@@ -1,6 +1,7 @@
 ---
 name: long-running-goals
 description: Maintain long-running, cross-session goals for an agent (Copilot CLI, Claude Code, Codex, etc.) using a declarative goals.md file. Use when the user wants the agent to remember objectives across sessions, when they say "let's set a goal", "remember to keep working on X", "what are we working on?", "resume the goal", or asks for persistent objectives that survive context resets and compaction.
+license: MIT
 ---
 
 # Long-Running Goals
@@ -20,12 +21,14 @@ Do **not** use for ephemeral todos within a single session — use the runtime's
 
 | Scope | Path | When |
 |---|---|---|
-| Per-repo | `.copilot/goals.md` (or `.claude/goals.md`, `.codex/goals.md` — match the agent) | Default. Project-specific objectives. |
-| Global  | `~/.copilot/goals.md` (or `~/.claude/goals.md`, etc.) | Cross-repo objectives ("learn Rust", "migrate everything to pnpm"). |
+| Per-repo | `.copilot/goals.md` | Default for Copilot CLI and for repo-owned goals. Project-specific objectives. |
+| Global  | `~/.copilot/goals.md` | Default for Copilot CLI and cross-repo objectives ("learn Rust", "migrate everything to pnpm"). |
+
+For non-Copilot agents, use the user's requested namespace if they specify one, for example `.claude/goals.md` or `.codex/goals.md`. If the user does not specify a namespace, prefer `.copilot/goals.md` because it is the proposed portable convention from [github/copilot-cli#3364](https://github.com/github/copilot-cli/issues/3364).
 
 When both exist, **always read both** at session start. Per-repo takes precedence on conflicts.
 
-Add `.copilot/goals.md` to `.gitignore` unless the team wants shared goals committed (ask the user).
+Add `.copilot/goals.md` to `.gitignore` on first write unless the team wants shared goals committed. Ask before committing goals files or ignore-file changes.
 
 ## File format
 
@@ -74,6 +77,8 @@ Keep it small. If a goal grows past ~30 lines, link out to a design doc instead 
 2. If there are `active` goals, surface them to the user briefly:
    > "Active goals: (1) <title> — next: <next>. (2) <title> — next: <next>. Resume work on one, or continue with something else?"
 3. Wait for direction before acting. Do **not** auto-start work — the user's current message takes priority.
+
+If the agent runtime does not invoke skills at session start, apply this workflow the first time the user asks about goals, continuity, resuming work, or long-running objectives.
 
 ### Adding a goal
 
